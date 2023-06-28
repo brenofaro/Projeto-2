@@ -4,6 +4,8 @@
 
 #define TAM 36
 #define path "alunos.txt"
+#define intervaloMenor 2022000
+#define intervaloMaior 2022999
 
 typedef struct {
     int matricula;
@@ -47,6 +49,7 @@ int main(void) {
     int matricula = 0;
     int escolha = 0;
     int escolhaTipo, escolhaOrdem;
+    char temp[100];
     double media;
     Aluno aluno;
     Aluno alunos[TAM];
@@ -72,7 +75,9 @@ int main(void) {
         sleep(2);
 
         exibirMenu();
-        scanf("%d", &escolha);
+        fflush(stdin);
+        fgets(temp, 100, stdin);
+        escolha = atoi(temp);
 
         switch (escolha) {
 
@@ -83,23 +88,42 @@ int main(void) {
 
 
                 printf("Digite a matricula do aluno [2022000 - 2022999]: \n");
-                scanf("%d", &aluno.matricula);
+                
+                fgets(temp, 100, stdin);
+                aluno.matricula = atoi(temp);
 
                 if (verificarExitencia(aluno.matricula, alunos) != -1) {
                     printf("Matricula ja existente\n");
                     break;
                 }
+                else if (aluno.matricula < intervaloMenor || aluno.matricula > intervaloMaior)
+                {
+                    printf("Matricula invalida\n");
+                    break;
+                }
+                
 
 
                 printf("Digite o nome do aluno: \n");
-                scanf("%s", aluno.nome);
+
+                
+                fgets(temp, 100, stdin);
+                //Retirando o /n da leitura do nome
+                temp[strlen(temp) - 1] = '\0';
+                strcpy(aluno.nome, temp);
+
+
                 fflush(stdin);
                 for (i = 0; i < 4; i++) {
                     printf("Digite a %d nota: \n", i + 1);
-                    scanf("%lf", &aluno.notas[i]);
+
+                    fgets(temp, 100, stdin);
+                    aluno.notas[i] = atof(temp);
+                    
                     while (aluno.notas[i] < 0 || aluno.notas[i] > 10) {
                         printf("Nota invalida, por favor digite novamente: \n");
-                        scanf("%lf", &aluno.notas[i]);
+                        fgets(temp, 100, stdin);
+                        aluno.notas[i] = atof(temp);
                     }
                 }
 
@@ -128,15 +152,22 @@ int main(void) {
                     printf("Aluno removido com sucesso\n");
 
 
-                } else {
+                } else if (matricula < intervaloMenor || matricula > intervaloMaior)
+                {
+                    printf("Matricula invalida\n");
+                    break;
+                }
+                else{
                     printf("Aluno nao encontrado\n");
                 }
+                
 
                 break;
 
             case 3:
                 printf("Digite o numero da matricula: \n");
-                scanf("%d", &aluno.matricula);
+                fgets(temp, 100, stdin);
+                aluno.matricula = atoi(temp);
 
                 int indice = verificarExitencia(aluno.matricula, alunos);
                 if (indice == -1) {
@@ -147,7 +178,13 @@ int main(void) {
 
 
                     printf("Digite o nome do aluno: \n");
-                    scanf("%s", aluno.nome);
+
+                    
+                    fgets(temp, 100, stdin);
+                    //Retirando o /n da leitura do nome
+                    temp[strlen(temp) - 1] = '\0';
+                    strcpy(aluno.nome, temp);
+
                     fflush(stdin);
                     for (i = 0; i < 4; i++) {
                         printf("Digite a %d nota: \n", i + 1);
@@ -181,7 +218,7 @@ int main(void) {
                 atualizarVetor(file, alunos);
                 cont = 0;
 
-                printf("Digite o codigo da turma: \n");
+                printf("Digite o codigo da turma:  (-1 para todas) \n");
                 scanf("%d", &codigoTurma);
 
                 printf("Buscando alunos\n");
@@ -195,14 +232,14 @@ int main(void) {
 
                     aluno = alunos[i];
                     if (aluno.matricula == -1) {
-
                     } else {
-                        if (aluno.codigoTurma == codigoTurma) {
+                        if (aluno.codigoTurma == codigoTurma || codigoTurma == -1) {
                             printf("Matricula: %d\n", aluno.matricula);
                             printf("Nome: %s\n", aluno.nome);
                             printf("Nota 1: %.2lf | Nota 2: %.2lf\n", aluno.notas[0], aluno.notas[1]);
                             printf("Nota 3: %.2lf | Nota 4: %.2lf\n", aluno.notas[2], aluno.notas[3]);
                             printf("Faltas: %d\n", aluno.faltas);
+                            printf("Codigo da Turma: %d\n", aluno.codigoTurma);
                             HLine();
                             cont++;
                         }
@@ -253,7 +290,7 @@ int main(void) {
                 atualizarVetor(file, alunos);
                 cont = 0;
 
-                printf("Digite o codigo da turma: \n");
+                printf("Digite o codigo da turma:  (-1 para todas) \n");
                 scanf("%d", &codigoTurma);
 
                 printf("Buscando alunos\n");
@@ -272,7 +309,7 @@ int main(void) {
                     if (aluno.matricula == -1) {
 
                     } else {
-                        if (aluno.codigoTurma == codigoTurma && media < 7) {
+                        if ((aluno.codigoTurma == codigoTurma || codigoTurma == -1) && media < 7) {
                             printf("Matricula: %d\n", aluno.matricula);
                             printf("Nome: %s\n", aluno.nome);
                             printf("Media: %.2lf\n", media);
@@ -290,7 +327,7 @@ int main(void) {
                 atualizarVetor(file, alunos);
                 cont = 0;
 
-                printf("Digite o codigo da turma: \n");
+                printf("Digite o codigo da turma:  (-1 para todas) \n");
                 scanf("%d", &codigoTurma);
 
                 printf("Buscando alunos\n");
@@ -309,7 +346,7 @@ int main(void) {
                     if (aluno.matricula == -1) {
 
                     } else {
-                        if (aluno.codigoTurma == codigoTurma && aluno.faltas > 14) {
+                        if ((aluno.codigoTurma == codigoTurma || codigoTurma == -1) && aluno.faltas > 14) {
                             printf("Matricula: %d\n", aluno.matricula);
                             printf("Nome: %s\n", aluno.nome);
                             printf("Frequencia %d/36: \n", 36 - aluno.faltas);
@@ -332,15 +369,29 @@ int main(void) {
                        "3 - Por Media\n"
                        "4 - Por Quantidade de Faltas\n");
                 scanf("%d", &escolhaTipo);
+                if (escolhaTipo < 1 || escolhaTipo > 4)
+                {
+                    printf("Opcao Invalida\n");
+                    break;
+                }
+                
                 sleep(1);
                 printf("Escolha a Ordem: \n"
                        "1 - Crescente\n"
                        "2 - Decrescente\n");
                 scanf("%d", &escolhaOrdem);
+                if (escolhaOrdem < 1 || escolhaOrdem > 2)
+                {
+                    printf("Opcao Invalida\n");
+                    break;
+                }
 
+                
+                
                 ordenarVetor(escolhaTipo, escolhaOrdem, alunos, alunosCadastrados);
                 atualizarArquivo(alunos, file);
                 printf("Ordenacao Concluida\n");
+                
 
                 break;
 
@@ -391,7 +442,7 @@ void exibirMenu() {
 
 int cadastrarAluno(Aluno aluno, FILE *file) {
     file = fopen(path, "a");
-    fprintf(file, "\n%d %s %.2lf %.2lf %.2lf %.2lf %d %d", aluno.matricula, aluno.nome, aluno.notas[0], aluno.notas[1],
+    fprintf(file, "\n%d '%s' %.2lf %.2lf %.2lf %.2lf %d %d", aluno.matricula, aluno.nome, aluno.notas[0], aluno.notas[1],
             aluno.notas[2], aluno.notas[3], aluno.codigoTurma, aluno.faltas);
     fclose(file);
     return 0;
@@ -406,7 +457,7 @@ int removerAluno(int indice, Aluno *alunos, FILE *file) {
         if (i == indice || alunos[i].matricula == -1)
             continue;
         else {
-            fprintf(file, "\n%d %s %.2lf %.2lf %.2lf %.2lf %d %d", aluno.matricula, aluno.nome, aluno.notas[0],
+            fprintf(file, "\n%d '%s' %.2lf %.2lf %.2lf %.2lf %d %d", aluno.matricula, aluno.nome, aluno.notas[0],
                     aluno.notas[1],
                     aluno.notas[2], aluno.notas[3], aluno.codigoTurma, aluno.faltas);
         }
@@ -438,7 +489,7 @@ void atualizarVetor(FILE *file, Aluno *alunos) {
     Aluno aluno;
     for (i = 0; i < TAM; i++) {
 
-        fscanf(file, "%d %s %lf %lf %lf %lf %d %d", &aluno.matricula, aluno.nome, &aluno.notas[0],
+        fscanf(file, "%d '%[^']' %lf %lf %lf %lf %d %d", &aluno.matricula, aluno.nome, &aluno.notas[0],
                &aluno.notas[1], &aluno.notas[2], &aluno.notas[3], &aluno.codigoTurma, &aluno.faltas);
 
 
@@ -465,12 +516,18 @@ void atualizarAluno(Aluno aluno, Aluno *alunos, int indice) {
 
 void atualizarArquivo(Aluno *alunos, FILE *file) {
     file = fopen(path, "w");
+    if (file == NULL)
+    {
+        printf("Erro ao abrir arquivo\n");
+        exit(1);
+    }
+    
     Aluno aluno;
     for (int i = 0; i < TAM; i++) {
         aluno = alunos[i];
         if (alunos[i].matricula == -1)
             continue;
-        fprintf(file, "\n%d %s %.2lf %.2lf %.2lf %.2lf %d %d", aluno.matricula, aluno.nome, aluno.notas[0],
+        fprintf(file, "\n%d '%s' %.2lf %.2lf %.2lf %.2lf %d %d", aluno.matricula, aluno.nome, aluno.notas[0],
                 aluno.notas[1],
                 aluno.notas[2], aluno.notas[3], aluno.codigoTurma, aluno.faltas);
     }
@@ -507,10 +564,21 @@ void ordenarVetor(int tipoOrdem, int ordem, Aluno *alunos, int alunosCadastrados
         }
     }
 
+    // Ordenar por nome Crescente e Decrescente Respectivamente
     if (ordem == 1 && tipoOrdem == 2) {
         for (i = 0; i < alunosCadastrados; i++) {
             for (j = 0; j < alunosCadastrados - i - 1; j++) {
                 if (strnicmp(alunos[j].nome, alunos[j + 1].nome, 10) > 0) {
+                    aux = alunos[j];
+                    alunos[j] = alunos[j + 1];
+                    alunos[j + 1] = aux;
+                }
+            }
+        }
+    } else if (ordem == 2 && tipoOrdem == 2) {
+        for (i = 0; i < alunosCadastrados; i++) {
+            for (j = 0; j < alunosCadastrados - i - 1; j++) {
+                if (strnicmp(alunos[j].nome, alunos[j + 1].nome, 10) < 0) {
                     aux = alunos[j];
                     alunos[j] = alunos[j + 1];
                     alunos[j + 1] = aux;
